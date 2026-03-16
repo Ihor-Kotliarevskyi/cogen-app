@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="КГУ">
+<meta name="theme-color" content="#0A0F1E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>КГУ Калькулятор</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0F1E;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: #1e2d45;
+  --border2: #2a3d5a;
+  --text: #E8EDF5;
+  --text2: #7A8FA8;
+  --text3: #3D5270;
+  --blue: #3B7BF6;
+  --blue-dim: #1a3a7a;
+  --green: #0FBF7F;
+  --green-dim: #063d28;
+  --red: #F04E4E;
+  --red-dim: #4a1414;
+  --amber: #F5A623;
+  --amber-dim: #4a2f08;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top)}
+
+/* ── Header ── */
+.header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.header-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.header-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Tabs ── */
+.tabs{display:flex;padding:10px 16px 0;gap:4px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;transition:all .18s;letter-spacing:.2px;font-family:'Syne',sans-serif}
+.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ── Scroll content ── */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:calc(16px + var(--safe-bottom))}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── Cards ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.card-tight{padding:12px}
+
+/* ── Section title ── */
+.sec{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin:20px 0 10px;font-family:'DM Mono',monospace}
+.sec:first-child{margin-top:0}
+
+/* ── KPI grid ── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 12px}
+.kpi-label{font-size:10px;color:var(--text2);margin-bottom:6px;font-family:'DM Mono',monospace;letter-spacing:.3px}
+.kpi-value{font-size:22px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.kpi-sub{font-size:10px;color:var(--text2);margin-top:5px;font-family:'DM Mono',monospace}
+.c-green{color:var(--green)}
+.c-red{color:var(--red)}
+.c-amber{color:var(--amber)}
+.c-blue{color:var(--blue)}
+.c-text{color:var(--text)}
+
+/* ── Slider rows ── */
+.slider-row{margin-bottom:14px}
+.slider-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.slider-label{font-size:12px;color:var(--text2);flex:1;line-height:1.4}
+.slider-tags{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.stag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'DM Mono',monospace}
+.slider-val{font-size:12px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;min-width:90px;text-align:right}
+input[type=range]{width:100%;height:4px;border-radius:2px;-webkit-appearance:none;appearance:none;background:var(--border2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px var(--blue-dim);cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px}
+
+/* ── P&L table ── */
+.pnl-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);gap:8px}
+.pnl-row:last-child{border-bottom:none}
+.pnl-row.total{border-top:1px solid var(--border2);border-bottom:none;margin-top:4px;padding-top:10px}
+.pnl-name{font-size:12px;color:var(--text2);flex:1}
+.pnl-row.total .pnl-name{color:var(--text);font-weight:700;font-size:13px}
+.pnl-amount{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.pnl-row.total .pnl-amount{font-size:14px}
+.pnl-pct{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;min-width:32px;text-align:right;flex-shrink:0}
+
+/* ── Balance table ── */
+.bal-table{width:100%;border-collapse:collapse}
+.bal-table th{font-size:10px;color:var(--text3);font-weight:600;font-family:'DM Mono',monospace;padding:5px 4px;text-align:right;border-bottom:1px solid var(--border)}
+.bal-table th:first-child{text-align:left}
+.bal-table td{font-size:11px;padding:6px 4px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:var(--text2)}
+.bal-table td:first-child{text-align:left;color:var(--text2);font-family:'Syne',sans-serif;font-size:11px}
+.bal-table tr.total td{color:var(--text);font-weight:700;font-size:12px;border-top:1px solid var(--border2);border-bottom:none}
+
+/* ── Info boxes ── */
+.info-box{border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:12px;border:1px solid}
+.info-box.blue{background:rgba(59,123,246,.1);border-color:rgba(59,123,246,.25);color:#93b8fb}
+.info-box.amber{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.25);color:#f9c96e}
+.info-box b{font-weight:700;color:inherit}
+
+/* ── Segment control ── */
+.seg-wrap{display:flex;gap:6px;margin-top:8px}
+.seg{flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border2);text-align:center;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Syne',sans-serif}
+.seg.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ── Derived box ── */
+.derived{background:var(--bg);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.derived-label{font-size:11px;color:var(--text3)}
+.derived-val{font-size:13px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace}
+
+/* ── Scenario cards ── */
+.sc-badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;font-family:'DM Mono',monospace}
+.sc-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.sc-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.sc-row:last-child{border-bottom:none}
+.sc-key{color:var(--text2)}
+.sc-val{font-weight:700;font-family:'DM Mono',monospace}
+.best-card{border-color:var(--green) !important}
+
+/* ── CF table ── */
+.cf-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.cf-row:last-child{border-bottom:none}
+.cf-year{color:var(--text2);width:55px;font-family:'DM Mono',monospace}
+.cf-val{font-weight:700;font-family:'DM Mono',monospace;flex:1;text-align:right}
+.cf-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;font-family:'DM Mono',monospace;flex-shrink:0}
+
+/* ── Sens table ── */
+.sens-table{width:100%;border-collapse:collapse}
+.sens-table th{font-size:10px;font-family:'DM Mono',monospace;padding:5px 4px;border-bottom:1px solid var(--border);color:var(--text3);text-align:right}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;padding:5px 4px;border-bottom:1px solid var(--border);text-align:right}
+.sens-table td:first-child{text-align:left;color:var(--text2);font-weight:400}
+
+/* ── Mini chart ── */
+.chart-area{position:relative;width:100%;height:180px;margin:4px 0}
+canvas{width:100%;height:100%}
+
+/* ── Reset btn ── */
+.reset-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Syne',sans-serif}
+.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.screen-title{font-size:20px;font-weight:800;letter-spacing:-.3px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="header-title">КГУ 1 МВт · БЦ</div>
+      <div class="header-sub" id="header-sub">завантаження...</div>
+    </div>
+    <div class="live-dot"></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard')">Результат</div>
+    <div class="tab" onclick="showTab('params')">Параметри</div>
+    <div class="tab" onclick="showTab('balance')">Баланси</div>
+    <div class="tab" onclick="showTab('cashflow')">CF / Графік</div>
+    <div class="tab" onclick="showTab('scenarios')">Сценарії</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="screen active" id="tab-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">СОБІВАРТІСТЬ ЕЛ.</div><div class="kpi-value" id="k-elcost">—</div><div class="kpi-sub" id="k-elcost-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">ОКУПНІСТЬ</div><div class="kpi-value" id="k-pb">—</div><div class="kpi-sub" id="k-pb-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">ДОХІД / РІК</div><div class="kpi-value c-blue" id="k-rev">—</div><div class="kpi-sub">ел. + тепло</div></div>
+        <div class="kpi"><div class="kpi-label">ПРИБУТОК / РІК</div><div class="kpi-value" id="k-net">—</div><div class="kpi-sub" id="k-net-sub">—</div></div>
+      </div>
+
+      <div id="warn-box"></div>
+
+      <div class="sec">P&L — Доходи та витрати</div>
+      <div class="card" id="pnl-card"></div>
+
+      <div class="sec">Газ</div>
+      <div class="card" id="gas-card"></div>
+    </div>
+
+    <!-- ══ PARAMS ══ -->
+    <div class="screen" id="tab-params">
+      <div class="title-row">
+        <div class="screen-title">Параметри</div>
+        <button class="reset-btn" onclick="resetParams()">Скинути</button>
+      </div>
+
+      <div class="sec">Ціни</div>
+      <div class="card">
+        <div id="s-gp"></div>
+        <div id="s-rdm"></div>
+        <div id="s-trans"></div>
+        <div id="s-distr"></div>
+        <div class="derived">
+          <span class="derived-label">Кінцева ціна для БЦ</span>
+          <span class="derived-val" id="d-elprice">—</span>
+        </div>
+      </div>
+
+      <div class="sec">Тепло в мережу</div>
+      <div class="card">
+        <div id="s-hp"></div>
+        <div style="margin-top:6px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Мережа бере тепло влітку? <span class="stag" style="background:rgba(15,191,127,.15);color:var(--green)">уточнити у ЛТЕ</span></div>
+          <div class="seg-wrap">
+            <div class="seg" id="seg-0" onclick="setSummerHeat(0)">Ні</div>
+            <div class="seg" id="seg-05" onclick="setSummerHeat(0.5)">50%</div>
+            <div class="seg active" id="seg-1" onclick="setSummerHeat(1)">Так</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">Електричне навантаження БЦ</div>
+      <div class="card">
+        <div id="s-elbase"></div>
+        <div id="s-vrfw"></div>
+        <div id="s-vrfs"></div>
+        <div class="derived">
+          <span class="derived-label">Зима: база + VRF</span>
+          <span class="derived-val" id="d-loadw">—</span>
+        </div>
+        <div class="derived" style="margin-top:6px">
+          <span class="derived-label">Літо: база + VRF</span>
+          <span class="derived-val" id="d-loads">—</span>
+        </div>
+      </div>
+
+      <div class="sec">Інвестиції</div>
+      <div class="card">
+        <div id="s-capex"></div>
+        <div id="s-opex"></div>
+        <div id="s-avail"></div>
+      </div>
+    </div>
+
+    <!-- ══ BALANCE ══ -->
+    <div class="screen" id="tab-balance">
+      <div class="screen-title" style="margin-bottom:16px">Баланси</div>
+
+      <div class="sec">Тепловий баланс</div>
+      <div id="heat-info-box"></div>
+      <div class="card card-tight">
+        <table class="bal-table">
+          <thead><tr><th>Показник</th><th>Зима</th><th>Літо</th><th>Рік</th></tr></thead>
+          <tbody id="heat-tbl"></tbody>
+        </table>
+      </div>
+      <div class="kpi-grid" style="margin-top:4px">
+        <div class="kpi"><div class="kpi-label">ТЕПЛО В МЕРЕЖУ</div><div class="kpi-value c-green" id="b-gcal">—</div><div class="kpi-sub">Гкал / рік</div></div>
+        <div class="kpi"><div class="kpi-label">ДОХІД ВІД ТЕПЛА</div><div class="kpi-value c-green" id="b-hrev">—</div><div class="kpi-sub">млн грн / рік</div></div>
+      </div>
+
+      <div class="sec">Електричний баланс</div>
+      <div id="el-info-box"></div>
+      <div class="card card-tight">
+        <table class="bal-table">
+          <thead><tr><th>Показник</th><th>Зима</th><th>Літо</th><th>Рік</th></tr></thead>
+          <tbody id="el-tbl"></tbody>
+        </table>
+      </div>
+      <div class="kpi-grid" style="margin-top:4px">
+        <div class="kpi"><div class="kpi-label">ГЕНЕРАЦІЯ</div><div class="kpi-value c-blue" id="b-kwh">—</div><div class="kpi-sub">млн кВт·год</div></div>
+        <div class="kpi"><div class="kpi-label">ЕКОНОМІЯ НА ЕЛ.</div><div class="kpi-value c-green" id="b-elsav">—</div><div class="kpi-sub">млн грн / рік</div></div>
+      </div>
+    </div>
+
+    <!-- ══ CASHFLOW ══ -->
+    <div class="screen" id="tab-cashflow">
+      <div class="screen-title" style="margin-bottom:16px">CF / Графік</div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">ОКУПНІСТЬ</div><div class="kpi-value" id="cf-pb">—</div><div class="kpi-sub" id="cf-pb-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">NPV ЗА 15 Р.</div><div class="kpi-value" id="cf-npv">—</div><div class="kpi-sub">без дисконту</div></div>
+      </div>
+
+      <div class="sec">Кумулятивний CF (млн грн)</div>
+      <div class="card" style="padding:12px">
+        <div class="chart-area"><canvas id="cf-canvas"></canvas></div>
+      </div>
+
+      <div class="sec">Таблиця CF по роках</div>
+      <div class="card" id="cf-table-card"></div>
+
+      <div class="sec">Чутливість окупності</div>
+      <div class="card card-tight">
+        <table class="sens-table" id="sens-table"></table>
+      </div>
+    </div>
+
+    <!-- ══ SCENARIOS ══ -->
+    <div class="screen" id="tab-scenarios">
+      <div class="screen-title" style="margin-bottom:16px">Сценарії</div>
+      <div id="sc-cards"></div>
+
+      <div class="sec">Порівняльна таблиця</div>
+      <div class="card card-tight">
+        <table class="sens-table" id="comp-table"></table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// PARAMS STATE
+// ══════════════════════════════════════
+const DEFAULTS = {
+  gp:21000, rdm:5800, trans:713, distr:2112,
+  hp:1800, summerHeat:1.0,
+  vrfW:0.35, vrfS:0.25, elBase:0.45,
+  capex:32e6, opexPct:4.0, avail:0.92
+};
+let P = {...DEFAULTS};
+
+function resetParams(){
+  P = {...DEFAULTS};
+  initSliders();
+  updateSegButtons();
+  renderAll();
+}
+
+// ══════════════════════════════════════
+// CALC ENGINE
+// ══════════════════════════════════════
+function calc(p){
+  const EL=1.0,TH=1.1,EFF=0.40,GHV=8.5,GHP=0.15,DHW=1700;
+  const hours=Math.round(8760*p.avail);
+  const hW=Math.round(hours*5/12), hS=hours-hW;
+  const gasM3h=(EL*1000)/EFF/GHV;
+  const gasAnn=gasM3h*hours;
+  const gasCost=gasAnn/1000*p.gp;
+  const thGrid=TH-GHP;
+  const gcalGW=thGrid*0.86*hW;
+  const gcalGS=thGrid*0.86*hS*p.summerHeat;
+  const gcalG=gcalGW+gcalGS;
+  const gcalInt=GHP*0.86*hours;
+  const heatRev=gcalG*p.hp;
+  const heatIntSave=gcalInt*DHW;
+  const elPrice=(p.rdm+p.trans+p.distr)/1000;
+  const elLW=p.elBase+p.vrfW, elLS=p.elBase+p.vrfS;
+  const covW=Math.min(EL,elLW), covS=Math.min(EL,elLS);
+  const impW=Math.max(0,elLW-EL), impS=Math.max(0,elLS-EL);
+  const surW=Math.max(0,EL-elLW), surS=Math.max(0,EL-elLS);
+  const kwhSav=covW*1000*hW+covS*1000*hS;
+  const elSav=kwhSav*elPrice;
+  const kwhGen=EL*1000*hours;
+  const elCostGen=gasCost/kwhGen;
+  const opex=p.capex*(p.opexPct/100);
+  const totalRev=elSav+heatRev+heatIntSave;
+  const net=totalRev-gasCost-opex;
+  const payback=net>0?p.capex/net:null;
+  const cf=[-(p.capex/1e6)];
+  for(let i=1;i<=15;i++) cf.push(parseFloat((-(p.capex/1e6)+(net/1e6)*i).toFixed(2)));
+  return{hours,hW,hS,gasM3h,gasAnn,gasCost,
+    thGrid,gcalGW,gcalGS,gcalG,gcalInt,heatRev,heatIntSave,
+    elPrice,elLW,elLS,covW,covS,impW,impS,surW,surS,
+    kwhSav,elSav,kwhGen,elCostGen,opex,totalRev,net,payback,cf};
+}
+
+// ══════════════════════════════════════
+// FORMATTERS
+// ══════════════════════════════════════
+function fN(n,d=0){return n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fM(n,d=1){return fN(n/1e6,d)+' млн';}
+function fG(n,d=2){return fN(n,d)+' грн';}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function renderAll(){
+  const r=calc(P);
+  renderHeader(r);
+  renderDashboard(r);
+  renderBalance(r);
+  renderCashflow(r);
+  renderScenarios(r);
+  updateDerived();
+}
+
+function renderHeader(r){
+  document.getElementById('header-sub').textContent =
+    `${fN(r.hours)} год/рік · газ ${fN(P.gp)} грн/тис.м³`;
+}
+
+function renderDashboard(r){
+  const elColor = r.elCostGen < r.elPrice ? 'c-green':'c-red';
+  const pbColor = r.payback ? (r.payback<4?'c-green':r.payback<7?'c-amber':'c-red'):'c-red';
+
+  el('k-elcost').className = 'kpi-value '+elColor;
+  el('k-elcost').textContent = fG(r.elCostGen);
+  el('k-elcost-sub').textContent = 'мережа: '+fG(r.elPrice);
+
+  el('k-pb').className = 'kpi-value '+pbColor;
+  el('k-pb').textContent = r.payback ? r.payback.toFixed(1)+' р.' : '∞';
+  el('k-pb-sub').textContent = 'CAPEX '+fM(P.capex,0);
+
+  el('k-rev').textContent = fM(r.totalRev);
+  el('k-net').className = 'kpi-value '+(r.net>0?'c-green':'c-red');
+  el('k-net').textContent = fM(r.net);
+  el('k-net-sub').textContent = r.net>0?'після газу та OPEX':'збиток';
+
+  el('warn-box').innerHTML = r.elCostGen >= r.elPrice
+    ? `<div class="info-box amber">Собівартість генерації вища за ринкову ціну. Перевірте параметри газу або ціну електрики.</div>` : '';
+
+  const pnlRows=[
+    {n:'Економія на купівлі електрики',v:r.elSav,pos:true,pct:r.totalRev},
+    {n:'Продаж тепла в мережу',v:r.heatRev,pos:true,pct:r.totalRev},
+    {n:'Економія ГВП',v:r.heatIntSave,pos:true,pct:r.totalRev},
+    {n:'РАЗОМ ДОХОДИ',v:r.totalRev,pos:true,total:true},
+    {n:'Витрати на газ',v:-r.gasCost,pos:false,pct:r.totalRev},
+    {n:'OPEX',v:-r.opex,pos:false,pct:r.totalRev},
+    {n:'ЧИСТИЙ ПРИБУТОК',v:r.net,pos:r.net>0,total:true},
+  ];
+  el('pnl-card').innerHTML = pnlRows.map(row=>`
+    <div class="pnl-row ${row.total?'total':''}">
+      <span class="pnl-name">${row.n}</span>
+      <span class="pnl-amount" style="color:${row.pos?'var(--green)':'var(--red)'}">${row.v>=0?'+':''}${fM(row.v)}</span>
+      ${row.pct&&!row.total?`<span class="pnl-pct">${fN(Math.abs(row.v)/row.pct*100,0)}%</span>`:'<span class="pnl-pct"></span>'}
+    </div>`).join('');
+
+  el('gas-card').innerHTML=`
+    <div class="pnl-row"><span class="pnl-name">Витрата газу</span><span class="pnl-amount c-text">${r.gasM3h.toFixed(1)} м³/год</span></div>
+    <div class="pnl-row"><span class="pnl-name">Річна витрата</span><span class="pnl-amount c-text">${fN(r.gasAnn/1000,1)} тис. м³</span></div>
+    <div class="pnl-row"><span class="pnl-name">Вартість газу/рік</span><span class="pnl-amount" style="color:var(--red)">${fM(r.gasCost)}</span></div>
+    <div class="pnl-row"><span class="pnl-name">Собівартість кВт·год</span><span class="pnl-amount" style="color:${r.elCostGen<r.elPrice?'var(--green)':'var(--red)'}">${fG(r.elCostGen)}</span></div>`;
+}
+
+function renderBalance(r){
+  const sh=P.summerHeat;
+  el('heat-info-box').innerHTML=`<div class="info-box blue">
+    <b>Тепло КГУ:</b> ГВП 0,15 МВт + мережа ${r.thGrid.toFixed(2)} МВт. 
+    Влітку мережа бере: <b>${sh===0?'нічого':sh===0.5?'50%':'всё'}</b>. 
+    Річний продаж: <b>${fN(r.gcalG,0)} Гкал</b>.
+  </div>`;
+
+  el('heat-tbl').innerHTML=`
+    <tr><td>Виробництво КГУ, МВт</td><td>1,10</td><td>1,10</td><td>1,10</td></tr>
+    <tr><td>ГВП (внутр.), МВт</td><td>0,15</td><td>0,15</td><td>0,15</td></tr>
+    <tr><td>В мережу, МВт</td><td style="color:var(--green)">${r.thGrid.toFixed(2)}</td><td style="color:var(--green)">${(r.thGrid*sh).toFixed(2)}</td><td style="color:var(--green)">${((r.gcalGW+r.gcalGS)/r.hours*1.163).toFixed(2)}</td></tr>
+    <tr class="total"><td>В мережу, тис.Гкал</td><td>${fN(r.gcalGW/1000,1)}</td><td>${fN(r.gcalGS/1000,1)}</td><td>${fN(r.gcalG/1000,1)}</td></tr>`;
+
+  el('b-gcal').textContent = fN(r.gcalG,0);
+  el('b-hrev').textContent = fN(r.heatRev/1e6,1);
+
+  const defW=r.impW>0, defS=r.impS>0;
+  el('el-info-box').innerHTML=`<div class="info-box ${defW?'amber':'blue'}">
+    <b>Зима:</b> навантаження ${r.elLW.toFixed(2)} МВт ${defW?`→ <b>дефіцит ${r.impW.toFixed(2)} МВт з мережі</b>`:'→ КГУ покриває повністю'}. 
+    <b>Літо:</b> навантаження ${r.elLS.toFixed(2)} МВт ${defS?`→ дефіцит ${r.impS.toFixed(2)} МВт`:`→ надлишок ${r.surS.toFixed(2)} МВт`}.
+  </div>`;
+
+  el('el-tbl').innerHTML=`
+    <tr><td>Виробництво КГУ, МВт</td><td>1,00</td><td>1,00</td><td>1,00</td></tr>
+    <tr><td>Навантаження (база+VRF), МВт</td><td>${r.elLW.toFixed(2)}</td><td>${r.elLS.toFixed(2)}</td><td>${((r.elLW*r.hW+r.elLS*r.hS)/r.hours).toFixed(2)}</td></tr>
+    <tr><td>КГУ покриває, МВт</td><td style="color:var(--green)">${r.covW.toFixed(2)}</td><td style="color:var(--green)">${r.covS.toFixed(2)}</td><td style="color:var(--green)">${(r.kwhSav/r.hours/1000).toFixed(2)}</td></tr>
+    <tr><td>З мережі, МВт</td><td style="color:${r.impW>0?'var(--red)':'var(--text3)'}">${r.impW>0?r.impW.toFixed(2):'—'}</td><td style="color:${r.impS>0?'var(--red)':'var(--text3)'}">${r.impS>0?r.impS.toFixed(2):'—'}</td><td style="color:var(--text3)">—</td></tr>
+    <tr class="total"><td>Збережено, млн кВт·год</td><td>${fN(r.covW*r.hW/1000,1)}</td><td>${fN(r.covS*r.hS/1000,1)}</td><td style="color:var(--green)">${fN(r.kwhSav/1e6,1)}</td></tr>`;
+
+  el('b-kwh').textContent = fN(r.kwhGen/1e6,2);
+  el('b-elsav').textContent = fN(r.elSav/1e6,1);
+}
+
+function renderCashflow(r){
+  const pbColor = r.payback?(r.payback<4?'c-green':r.payback<7?'c-amber':'c-red'):'c-red';
+  el('cf-pb').className='kpi-value '+pbColor;
+  el('cf-pb').textContent = r.payback?r.payback.toFixed(1)+' р.':'∞';
+  const beYear = r.cf.findIndex(v=>v>=0);
+  el('cf-pb-sub').textContent = beYear>0?'рік '+beYear:'не окупається';
+  const npv15=r.cf[15];
+  el('cf-npv').className='kpi-value '+(npv15>0?'c-green':'c-red');
+  el('cf-npv').textContent=fN(npv15,1)+' млн';
+
+  drawCFChart(r.cf);
+
+  el('cf-table-card').innerHTML = r.cf.map((v,i)=>`
+    <div class="cf-row">
+      <span class="cf-year">${i===0?'Старт':'Рік '+i}</span>
+      <span class="cf-val" style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'+':''}${fN(v,1)} млн</span>
+      <span class="cf-badge" style="background:${v>=0?'var(--green-dim)':'var(--red-dim)'};color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'✓ окупився':'· в мінусі'}</span>
+    </div>`).join('');
+
+  const elPrices=[6,7,8,9,10,11,12,13,14];
+  const gasSets=[{g:18000,c:'var(--green)'},{g:21000,c:'var(--blue)'},{g:24000,c:'var(--red)'}];
+  el('sens-table').innerHTML=`
+    <thead><tr><th>Ціна ел.</th>${gasSets.map(g=>`<th style="color:${g.c}">Газ ${g.g/1000}т.</th>`).join('')}</tr></thead>
+    <tbody>${elPrices.map(ep=>`<tr>
+      <td>${ep} грн</td>
+      ${gasSets.map(g=>{
+        const sc=calc({...P,rdm:ep*1000-P.trans-P.distr,gp:g.g});
+        const pb=sc.payback;
+        const c=pb?(pb<4?'var(--green)':pb<7?'var(--amber)':'var(--red)'):'var(--red)';
+        return `<td style="color:${c}">${pb?pb.toFixed(1)+' р.':'∞'}</td>`;
+      }).join('')}
+    </tr>`).join('')}</tbody>`;
+}
+
+let cfChart=null;
+function drawCFChart(cfData){
+  const canvas=document.getElementById('cf-canvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-24;
+  const H=180;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const pad={l:38,r:12,t:12,b:28};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+  const n=cfData.length;
+  const minV=Math.min(...cfData), maxV=Math.max(...cfData);
+  const range=maxV-minV||1;
+
+  function xOf(i){return pad.l+i/(n-1)*cW;}
+  function yOf(v){return pad.t+cH-(v-minV)/range*cH;}
+
+  // Grid
+  ctx.strokeStyle='rgba(30,45,69,0.8)';
+  ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+i*cH/4;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    const val=maxV-(i/4)*range;
+    ctx.fillStyle='#3D5270';ctx.font='9px DM Mono,monospace';
+    ctx.textAlign='right';ctx.fillText(fN(val,0)+'м',pad.l-4,y+3);
+  }
+
+  // Zero line
+  if(minV<0&&maxV>0){
+    const y0=yOf(0);
+    ctx.strokeStyle='rgba(15,191,127,0.3)';ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pad.l,y0);ctx.lineTo(W-pad.r,y0);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Fill
+  ctx.beginPath();ctx.moveTo(xOf(0),yOf(cfData[0]));
+  cfData.forEach((_,i)=>{if(i>0)ctx.lineTo(xOf(i),yOf(cfData[i]));});
+  ctx.lineTo(xOf(n-1),H-pad.b);ctx.lineTo(xOf(0),H-pad.b);ctx.closePath();
+  ctx.fillStyle='rgba(59,123,246,0.12)';ctx.fill();
+
+  // Line
+  ctx.beginPath();ctx.moveTo(xOf(0),yOf(cfData[0]));
+  cfData.forEach((_,i)=>{if(i>0)ctx.lineTo(xOf(i),yOf(cfData[i]));});
+  ctx.strokeStyle='#3B7BF6';ctx.lineWidth=2;ctx.stroke();
+
+  // Points
+  cfData.forEach((v,i)=>{
+    ctx.beginPath();ctx.arc(xOf(i),yOf(v),3.5,0,Math.PI*2);
+    ctx.fillStyle=v>=0?'#0FBF7F':'#F04E4E';ctx.fill();
+  });
+
+  // X labels
+  ctx.fillStyle='#3D5270';ctx.font='9px DM Mono,monospace';ctx.textAlign='center';
+  [0,3,6,9,12,15].forEach(i=>{
+    ctx.fillText(i===0?'Старт':'р.'+i, xOf(i), H-pad.b+14);
+  });
+}
+
+function renderScenarios(r){
+  function scCalc(ov){return calc({...P,...ov});}
+  const scenarios=[
+    {key:'cons',title:'Консервативний',badge:'Мережа не бере влітку',color:'var(--text2)',r:scCalc({summerHeat:0,hp:800}),best:false},
+    {key:'base',title:'Базовий (поточний)',badge:'Ваші параметри',color:'var(--green)',r:r,best:true},
+    {key:'opt',title:'Оптимістичний',badge:'РДН 8грн, газ-10%, тепло 2500',color:'var(--blue)',r:scCalc({rdm:8000,gp:Math.round(P.gp*0.9),hp:2500,summerHeat:1,avail:0.95}),best:false},
+    {key:'noHeat',title:'Тільки електрика',badge:'Без продажу тепла',color:'var(--amber)',r:scCalc({hp:0,summerHeat:0}),best:false},
+  ];
+
+  el('sc-cards').innerHTML=scenarios.map(s=>`
+    <div class="card ${s.best?'best-card':''}">
+      <div class="sc-badge" style="background:${s.color}22;color:${s.color}">${s.badge}</div>
+      <div class="sc-title">${s.title}</div>
+      <div class="sc-row"><span class="sc-key">Собів. ел.</span><span class="sc-val" style="color:${s.r.elCostGen<s.r.elPrice?'var(--green)':'var(--red)'}">${fG(s.r.elCostGen)}</span></div>
+      <div class="sc-row"><span class="sc-key">Тепло в мережу</span><span class="sc-val">${fN(s.r.gcalG,0)} Гкал</span></div>
+      <div class="sc-row"><span class="sc-key">Прибуток / рік</span><span class="sc-val" style="color:${s.r.net>0?'var(--green)':'var(--red)'}">${fM(s.r.net)}</span></div>
+      <div class="sc-row"><span class="sc-key">Окупність</span><span class="sc-val" style="color:${s.r.payback?(s.r.payback<5?'var(--green)':'var(--amber)'):'var(--red)'}">${s.r.payback?s.r.payback.toFixed(1)+' р.':'∞'}</span></div>
+    </div>`).join('');
+
+  const metrics=[
+    {l:'Собів. ел.',f:s=>fG(s.elCostGen,2)},
+    {l:'Дохід, млн',f:s=>fM(s.totalRev,1)},
+    {l:'Прибуток, млн',f:s=>fM(s.net,1)},
+    {l:'Окупність',f:s=>s.payback?s.payback.toFixed(1)+' р.':'∞'},
+    {l:'NPV 15р.',f:s=>fN(s.cf[15],1)+' млн'},
+  ];
+  el('comp-table').innerHTML=`
+    <thead><tr><th></th>${scenarios.map(s=>`<th style="color:${s.color};font-size:10px">${s.title.split(' ')[0]}</th>`).join('')}</tr></thead>
+    <tbody>${metrics.map(m=>`<tr><td>${m.l}</td>${scenarios.map(s=>`<td>${m.f(s.r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+}
+
+// ══════════════════════════════════════
+// SLIDERS
+// ══════════════════════════════════════
+const SLIDERS=[
+  {id:'s-gp',key:'gp',label:'Ціна газу, грн/тис.м³',min:15000,max:26000,step:500,fmt:v=>fN(v)+' грн',tag:'ринок',tagColor:'var(--red)'},
+  {id:'s-rdm',key:'rdm',label:'РДН, грн/МВт·год',min:3000,max:9000,step:100,fmt:v=>fN(v)+' грн',tag:'волат.',tagColor:'var(--red)'},
+  {id:'s-trans',key:'trans',label:'Передача Укренерго, грн/МВт·год',min:600,max:900,step:10,fmt:v=>fN(v)+' грн',tag:'НКРЕКП',tagColor:'var(--text3)'},
+  {id:'s-distr',key:'distr',label:'Розподіл Львівобленерго, грн/МВт·год',min:1800,max:2500,step:10,fmt:v=>fN(v)+' грн',tag:'НКРЕКП',tagColor:'var(--text3)'},
+  {id:'s-hp',key:'hp',label:'Ціна тепла в мережу, грн/Гкал',min:800,max:3000,step:100,fmt:v=>fN(v)+' грн',tag:'ЛТЕ',tagColor:'var(--green)'},
+  {id:'s-elbase',key:'elBase',label:'Базове ел. навантаження (без VRF), МВт',min:0.2,max:0.8,step:0.05,fmt:v=>v.toFixed(2)+' МВт'},
+  {id:'s-vrfw',key:'vrfW',label:'VRF опалення взимку, МВт',min:0.1,max:0.7,step:0.05,fmt:v=>v.toFixed(2)+' МВт'},
+  {id:'s-vrfs',key:'vrfS',label:'VRF охолодження влітку, МВт',min:0.1,max:0.6,step:0.05,fmt:v=>v.toFixed(2)+' МВт'},
+  {id:'s-capex',key:'capex',label:'CAPEX «під ключ», млн грн',min:22e6,max:55e6,step:1e6,fmt:v=>fN(v/1e6,0)+' млн',tag:'орієнтир',tagColor:'var(--amber)'},
+  {id:'s-opex',key:'opexPct',label:'OPEX, % від CAPEX/рік',min:2,max:7,step:0.5,fmt:v=>v.toFixed(1)+'%'},
+  {id:'s-avail',key:'avail',label:'Коефіцієнт доступності КГУ',min:0.80,max:0.97,step:0.01,fmt:v=>`${v.toFixed(2)} → ${fN(Math.round(8760*v))} год`},
+];
+
+function initSliders(){
+  SLIDERS.forEach(s=>{
+    const wrap=document.getElementById(s.id);
+    if(!wrap)return;
+    const val=P[s.key];
+    wrap.innerHTML=`
+      <div class="slider-row">
+        <div class="slider-head">
+          <span class="slider-label">${s.label}</span>
+          <div class="slider-tags">
+            ${s.tag?`<span class="stag" style="background:${s.tagColor}22;color:${s.tagColor}">${s.tag}</span>`:''}
+            <span class="slider-val" id="sv-${s.key}">${s.fmt(val)}</span>
+          </div>
+        </div>
+        <input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}" id="sl-${s.key}">
+      </div>`;
+    document.getElementById('sl-'+s.key).addEventListener('input',function(){
+      P[s.key]=parseFloat(this.value);
+      document.getElementById('sv-'+s.key).textContent=s.fmt(P[s.key]);
+      updateDerived();
+      renderAll();
+    });
+  });
+}
+
+function updateDerived(){
+  const ep=el('d-elprice');
+  if(ep) ep.textContent=((P.rdm+P.trans+P.distr)/1000).toFixed(2)+' грн/кВт·год';
+  const lw=el('d-loadw');
+  if(lw) lw.textContent=(P.elBase+P.vrfW).toFixed(2)+' МВт';
+  const ls=el('d-loads');
+  if(ls) ls.textContent=(P.elBase+P.vrfS).toFixed(2)+' МВт';
+}
+
+function setSummerHeat(v){
+  P.summerHeat=v;
+  updateSegButtons();
+  renderAll();
+}
+function updateSegButtons(){
+  ['seg-0','seg-05','seg-1'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  const map={0:'seg-0',0.5:'seg-05',1:'seg-1'};
+  document.getElementById(map[P.summerHeat])?.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs=['dashboard','params','balance','cashflow','scenarios'];
+  const labels=['Результат','Параметри','Баланси','CF / Графік','Сценарії'];
+  const idx=tabs.indexOf(name);
+  document.querySelectorAll('.tab')[idx]?.classList.add('active');
+  if(name==='cashflow'){
+    setTimeout(()=>{const r=calc(P);drawCFChart(r.cf);},50);
+  }
+}
+
+function el(id){return document.getElementById(id);}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initSliders();
+  updateSegButtons();
+  renderAll();
+});
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}</script>
+</body>
+</html>
