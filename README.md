@@ -65,11 +65,11 @@ firebase deploy
 
 ## 🧭 Примітки
 
-- Якщо сайт не в корені домену (наприклад `/app/`), додайте у `vite.config.js`:
+- Якщо сайт не в корені домену (наприклад `/app/`) або деплоїте підпапку (GitHub Pages), додайте у `vite.config.js`:
 
 ```js
 export default defineConfig({
-  base: '/app/',
+  base: './', // або '/repo-name/' для GitHub Pages
   plugins: [react()]
 });
 ```
