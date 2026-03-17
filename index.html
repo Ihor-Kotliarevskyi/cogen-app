@@ -592,16 +592,32 @@
       </div>
 
       <div class="tabbar">
-        <div class="tab active" onclick="showTab('dash')">Результат</div>
-        <div class="tab" onclick="showTab('params')">Параметри</div>
+        <div class="tab active" onclick="showTab('params')">Параметри</div>
+        <div class="tab" onclick="showTab('dash')">Результат</div>
         <div class="tab" onclick="showTab('balance')">Баланси</div>
         <div class="tab" onclick="showTab('cf')">CF / Графік</div>
         <div class="tab" onclick="showTab('sc')">Сценарії</div>
       </div>
 
       <div class="content">
+        <!-- ═══ PARAMS ═══ -->
+        <div class="screen active" id="tab-params">
+          <div class="title-row">
+            <div class="scr-title">Параметри</div>
+            <button class="reset-btn" onclick="resetP()">Скинути</button>
+          </div>
+          <div class="sec">Ціни</div>
+          <div class="card" id="p-prices"></div>
+          <div class="sec">Тепло в мережу</div>
+          <div class="card" id="p-heat"></div>
+          <div class="sec">Електричне навантаження БЦ</div>
+          <div class="card" id="p-el"></div>
+          <div class="sec">Інвестиції</div>
+          <div class="card" id="p-inv"></div>
+        </div>
+
         <!-- ═══ DASHBOARD ═══ -->
-        <div class="screen active" id="tab-dash">
+        <div class="screen" id="tab-dash">
           <div class="mg">
             <div class="m">
               <div class="ml">собівартість ел.</div>
@@ -629,22 +645,6 @@
           <div class="card" id="pnl"></div>
           <div class="sec">Газ</div>
           <div class="card" id="gas-det"></div>
-        </div>
-
-        <!-- ═══ PARAMS ═══ -->
-        <div class="screen active" id="tab-params">
-          <div class="title-row">
-            <div class="scr-title">Параметри</div>
-            <button class="reset-btn" onclick="resetP()">Скинути</button>
-          </div>
-          <div class="sec">Ціни</div>
-          <div class="card" id="p-prices"></div>
-          <div class="sec">Тепло в мережу</div>
-          <div class="card" id="p-heat"></div>
-          <div class="sec">Електричне навантаження БЦ</div>
-          <div class="card" id="p-el"></div>
-          <div class="sec">Інвестиції</div>
-          <div class="card" id="p-inv"></div>
         </div>
 
         <!-- ═══ BALANCE ═══ -->
