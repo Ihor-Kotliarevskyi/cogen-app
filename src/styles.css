@@ -558,3 +558,229 @@ canvas {
   color: var(--text);
 }
 
+/* ── Header extras ── */
+.hdr-region {
+  color: var(--blue);
+  font-weight: 500;
+}
+.live-label {
+  font-size: 10px;
+}
+
+/* ── Saved scenarios ── */
+.save-modal {
+  margin-bottom: 14px;
+}
+.save-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  background: var(--bg2);
+  color: var(--text);
+}
+.save-input:focus {
+  border-color: var(--blue);
+}
+.btn-primary {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-secondary {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+.save-btn {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.export-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.btn-export {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border2);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.btn-export:active {
+  background: var(--bg3);
+}
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+.sc-saved-card {
+  margin-bottom: 8px;
+}
+.sc-saved-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.sc-saved-date {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+.sc-saved-metrics {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--border);
+}
+.sc-saved-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.sc-saved-metric-label {
+  font-size: 10px;
+  color: var(--text3);
+}
+.sc-saved-metric span:last-child {
+  font-size: 12px;
+  font-weight: 600;
+}
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+  background: var(--bg2);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.btn-icon:active {
+  background: var(--bg3);
+}
+.btn-icon-danger:active {
+  background: var(--red-bg);
+}
+
+/* ── Print report ── */
+.print-report {
+  display: none;
+}
+
+@media print {
+  /* Hide everything except print report */
+  body > #root > * {
+    display: none !important;
+  }
+  .print-report {
+    display: block !important;
+    padding: 20px;
+    color: #000;
+    font-size: 12px;
+  }
+  .app { display: none !important; }
+
+  .print-header {
+    text-align: center;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 16px;
+  }
+  .print-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .print-header h2 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+  }
+  .print-date {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .print-section {
+    margin-bottom: 20px;
+  }
+  .print-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ddd;
+  }
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .print-table td,
+  .print-table th {
+    padding: 4px 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 11px;
+  }
+  .print-table td:first-child {
+    color: #555;
+  }
+  .print-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+  }
+  .print-total td {
+    border-top: 1.5px solid #000;
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 12px;
+    padding-top: 6px;
+  }
+  .print-cf {
+    font-size: 10px;
+  }
+  .print-cf th, .print-cf td {
+    text-align: center;
+    padding: 3px 2px;
+    font-size: 9px;
+  }
+  .print-green { color: #1d9e75; }
+  .print-red { color: #e24b4a; }
+  .print-amber { color: #ba7517; }
+  .print-footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 10px;
+    color: #aaa;
+  }
+}
