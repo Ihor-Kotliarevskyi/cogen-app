@@ -62,14 +62,14 @@ function SliderGroup({ sliders, P, onChange, extra }) {
 }
 
 export default function ParamsScreen() {
-  const { P, dispatch } = useCalc();
+  const { P, dispatch, resetToDefaults } = useCalc();
 
   const onChange = (key, value) => {
     dispatch({ type: 'SET_PARAM', key, value });
   };
 
   const handleReset = () => {
-    dispatch({ type: 'RESET' });
+    resetToDefaults();
   };
 
   const setSH = (v) => {
